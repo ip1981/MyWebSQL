@@ -12,8 +12,9 @@
 
 	include(BASE_PATH . '/lib/functions.php');
 
-	function showDBError() {
-		return __('Database connection failed to the server') . '. ' . __('Host') . ': ' . DB_HOST . ', ' . __('User') . ': ' . DB_USER;
+	function showDBError($host, $user, $msg='') {
+		return __('Database connection failed to the server') .  '. ' .
+			__('Host') . ": $host," . __('User') . ": $user. ". $msg;
 	}
 
 	function getDbName() {

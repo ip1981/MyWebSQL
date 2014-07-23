@@ -118,12 +118,12 @@ class DB_Pgsql {
 	function setAuthOptions($options) {
 	}
 
-	function connect($ip, $user, $password, $db="")	{
+	function connect($server, $user, $password, $db="")	{
 		if (!function_exists('pg_connect')) {
 			return $this->error(str_replace('{{NAME}}', 'PGSQL', __('{{NAME}} client library is not installed')));
 		}
 
-		$this->conn_str = $this->build_conn_string($ip, $user, $password, $db);
+		$this->conn_str = $this->build_conn_string($server, $user, $password, $db);
 		$this->conn = @pg_connect($this->conn_str);
 		if (!$this->conn)
 			return $this->error(__('Database connection failed to the server'));
@@ -794,12 +794,8 @@ class DB_Pgsql {
 	}
 
 	// builds connection string for pgsql connect method from parameters
-	protected function build_conn_string($ip, $user, $password, $db) {
-		$host = $ip;
-		$port = '';
-		if (strpos($ip, ':') !== false) {
-			list($host, $port) = explode(':', $ip);
-		}
+	protected function build_conn_string($server, $user, $password, $db) {
+		list($host, $port) = explode(':', $server['host']);
 		$str = "host=" . pg_escape_string($host) . " user=" . pg_escape_string($user);
 		$str .= " password=" . pg_escape_string($password);
 		if( !empty($port) )

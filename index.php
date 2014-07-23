@@ -31,23 +31,22 @@
 	include_once(BASE_PATH . "/lib/util.php");
 
 	require( BASE_PATH . '/modules/auth.php');
-	$auth_module = new MyWebSQL_Authentication();
-	if (!$auth_module->authenticate()) {
+	$auth = new MyWebSQL_Authentication();
+	if (!$auth->authenticate()) {
 		if (v($_REQUEST["q"]) == "wrkfrm")
 			echo view('session_expired');
 		else {
 			include(BASE_PATH . "/modules/splash.php");
 			$form = view( 'auth', array(
-				'LOGINID'     => htmlspecialchars( $auth_module->getUserName() ),
-				'SERVER_NAME' => htmlspecialchars( $auth_module->getCustomServer() ),
-				'SERVER_TYPE' => htmlspecialchars( $auth_module->getCustomServerType() ),
+				'LOGINID'     => htmlspecialchars( $auth->getUserName() ),
+				'SERVER_NAME' => htmlspecialchars( $auth->getCustomServer() ),
+				'SERVER_TYPE' => htmlspecialchars( $auth->getCustomServerType() ),
 			) );
-			echo getSplashScreen($auth_module->getError(), $form);
+			echo getSplashScreen($auth->getError(), $form);
 		}
 		Output::flush();
 		exit();
 	}
-	unset($auth_module);
 
 	$_db_info = getDBClass();
 	include_once($_db_info[0]);
@@ -70,8 +69,8 @@
 	include_once(BASE_PATH . "/lib/options.php");
 
 	if (v($_REQUEST["q"]) == "wrkfrm") {
-		if (!$DB->connect(DB_HOST, DB_USER, DB_PASS, getDbName() ))
-			die(showDBError());
+		if (!$DB->connect($auth->getServerInfo(), $auth->getUserName(), $auth->getUserPassword(), getDbName()))
+			die(showDBError($auth->getServerInfo()['host'], $auth->getUserName()));
 		execute_request($DB);
 		$DB->disconnect();
 		include_once(BASE_PATH . "/lib/output.php");
@@ -80,7 +79,7 @@
 	}
 
 	include(BASE_PATH . "/lib/html.php");
-	include(BASE_PATH. "/lib/interface.php");
+	include(BASE_PATH . "/lib/interface.php");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -97,9 +96,9 @@
 </head>
 <body class="mainbody">
 <?php
-	if (!$DB->connect(DB_HOST,DB_USER,DB_PASS,getDbName())) {
+	if (!$DB->connect($auth->getServerInfo(), $auth->getUserName(), $auth->getUserPassword(), getDbName())) {
 		include(BASE_PATH . "/modules/splash.php");
-		die(getSplashScreen(showDBError()));
+		die(getSplashScreen(showDBError($auth->getServerInfo()['host'], $auth->getUserName(), var_dump($auth))));
 	}
 	if (Session::get('session', 'init') != '1') {
 		// session just started, so we load information here
@@ -270,7 +269,8 @@
 		Session::del('db', 'changed');
 	}
 	else
-		echo 'document.getElementById("messageContainer").innerHTML = "Connected to: '.DB_HOST.' as '.DB_USER.'";';
+		echo 'document.getElementById("messageContainer").innerHTML = "Connected to: ' .
+			$auth->getServerInfo()['host'].' as '.$auth->getUserName().'";';
 ?>
 </script>
 <script type="text/javascript" language="javascript" src="cache.php?script=layout,ui,dialogs,context,alerts,cookies,select,interface,options,treeview,common,taskbar,settings,query,tables,sorttable,clipboard"></script>

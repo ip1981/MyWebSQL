@@ -121,19 +121,68 @@ class DB_Mysqli {
 	function setAuthOptions($options) {
 	}
 
-	function connect($ip, $user, $password, $db="")	{
-		if (!function_exists('mysqli_connect')) {
+	function connect($server, $user, $password, $db="") {
+		if (!function_exists('mysqli_real_connect')) {
 			return $this->error(str_replace('{{NAME}}', 'MySQLi', __('{{NAME}} client library is not installed')));
 		}
 
-		$this->conn = @mysqli_connect($ip, $user, $password);
-		if (!$this->conn)
-			return $this->error(__('Database connection failed to the server'));
+		$this->conn = mysqli_init();
+		$flags = 0;
 
-		if ($db && !@mysqli_select_db($this->conn, $db))
-			return $this->error(mysqli_error($this->conn));
+		$use_ssl = !empty($server['ssl']);
+		if ($use_ssl) {
+			$flags += MYSQLI_CLIENT_SSL;
+			log_message('DB: mysqli: using SSL');
 
-		$this->ip = $ip;
+			$ssl_ca = null;
+			$ssl_ca_path = null;
+			$ssl_cert = null;
+			$ssl_key = null;
+			$ssl_cipher = null;
+			$ssl_verify_server_cert = !empty($server['ssl-verify-server-cert']);
+
+			if (!empty($server['ssl-cipher'])) {
+				$ssl_cipher = $server['ssl-cipher'];
+				log_message('DB: mysqli: SSL client cipher: ' . $ssl_cipher);
+			}
+
+			if (!empty($server['ssl-cert'])) {
+				$ssl_cert = $server['ssl-cert'];
+				log_message('DB: mysqli: SSL client cert: ' . $ssl_cert);
+			}
+
+			if (!empty($server['ssl-key'])) {
+				$ssl_key = $server['ssl-key'];
+				log_message('DB: mysqli: SSL client key: ' . $ssl_key);
+			}
+
+			mysqli_options($this->conn, MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, $ssl_verify_server_cert);
+			if ($ssl_verify_server_cert) {
+				log_message('DB: mysqli: will verify server certificate');
+				if (!empty($server['ssl-ca'])) {
+					$ssl_ca = $server['ssl-ca'];
+					log_message('DB: mysqli: SSL CA cert: ' . $ssl_ca);
+				}
+
+				if (!empty($server['ssl-ca-path'])) {
+					$ssl_ca_path = $server['ssl-ca-path'];
+					log_message('DB: mysqli: SSL CA path: ' . $ssl_ca_path);
+				}
+			}
+
+			mysqli_ssl_set($this->conn, $ssl_key, $ssl_cert, $ssl_ca, $ssl_ca_path, $ssl_cipher);
+		} else {
+			log_message('DB: mysqli: not using SSL');
+		}
+
+		list($host, $port) = explode(':', $server['host']);
+		$connected = @mysqli_real_connect($this->conn, $host, $user, $password, $db, $port, null, $flags);
+		if (!$connected) {
+			return $this->error(__('Database connection failed to the server') . ": " .
+				mysqli_connect_error());
+		}
+
+		$this->ip = $host;
 		$this->user = $user;
 		$this->password = $password;
 		$this->db = $db;

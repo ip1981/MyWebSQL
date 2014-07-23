@@ -34,7 +34,7 @@ class DbManager {
 		$db = new $class();
 		$db->setAuthOptions($server);
 		
-		$result = $db->connect($host, $user, $password);
+		$result = $db->connect($server, $user, $password);
 		if (!$result) {
 			$this->errMsg = $db->getError();
 			return false;

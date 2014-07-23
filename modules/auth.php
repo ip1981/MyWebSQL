@@ -13,6 +13,7 @@
 		private $username;
 		private $password;
 		private $db;
+		private $server;
 		private $custom_auth;
 
 		public function authenticate() {
@@ -22,6 +23,7 @@
 			$this->error = '';
 			$this->username = '';
 			$this->password = '';
+			$this->server = array();
 			$this->custom_auth = null;
 
 			// change of auth type at runtime invalidates session
@@ -58,6 +60,14 @@
 		public function getUserName() {
 			return $this->username;
 		}
+
+		public function getUserPassword() {
+			return $this->password;
+		}
+
+		public function getServerInfo() {
+			return $this->server[1];
+		}
 		
 		public function getCustomServer() {
 			return v($_POST['server_name']);
@@ -87,22 +97,17 @@
 		}
 
 		private function setParameters() {
-			$host = $driver = '';
 			switch(AUTH_TYPE) {
 				case 'NONE':
-					$server = $this->getDefaultServer();
-					$host = $server[1]['host'];
-					$driver = $server[1]['driver'];
+					$this->server = $this->getDefaultServer();
 					$this->username = AUTH_LOGIN;
 					$this->password = AUTH_PASSWORD;
 					break;
 				case 'BASIC':
-					$server = $this->getDefaultServer();
-					$host = $server[1]['host'];
-					$driver = $server[1]['driver'];
+					$this->server = $this->getDefaultServer();
 				case 'LOGIN':
-					$host = Session::get('auth', 'host', true);
-					$driver = Session::get('db', 'driver');
+					$server_name = Session::get('auth', 'server_name', true);
+					$this->server = $this->getServer($server_name); // XXX Rewrite getServer to be strict (e. i. no default)
 					$this->username = Session::get('auth', 'user', true);
 					$this->password = Session::get('auth', 'pwd', true);
 					break;
@@ -110,17 +115,10 @@
 					require_once(BASE_PATH . '/lib/auth/custom.php');
 					$this->custom_auth = new MyWebSQL_Auth_Custom();
 					$param = $this->custom_auth->getParameters();
-					$host = v($param['host']);
-					$driver = v($param['driver']);
 					$this->username = v($param['username']);
 					$this->password = v($param['password']);
 					break;
 			}
-
-			// driver should not be defined, since it is only used to create db objects
-			define("DB_HOST", $host);
-			define("DB_USER", $this->username);
-			define("DB_PASS", $this->password);
 
 			Session::set('auth', 'type', AUTH_TYPE);
 			// set the language

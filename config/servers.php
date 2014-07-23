@@ -47,6 +47,20 @@
 		                             'host'     => 'localhost',
 		                             'driver'   => 'pgsql'
 		                         ),
+		 /*
+		'Example MySQL SSL'           => array(
+		                             'host'     => 'example.com',
+		                             'driver'   => 'mysqli',
+		                             'ssl' => TRUE,
+		                             'ssl-verify-server-cert' => TRUE,
+		                             'ssl-ca' => '/etc/ssl/ca-cert.pem',
+		                             'ssl-ca-path' => '/etc/ssl',
+		                             'ssl-cipher' => 'DHE-RSA-AES256-SHA:AES128-SHA',
+		                             // XXX: this may be user specific like a password:
+		                             'ssl-cert' => '/var/lib/ssl/client-foo-cert.pem',
+		                             'ssl-key' => '/var/lib/ssl/client-foo-key.pem',
+		                         ),
+		*/
 		/*'MySQL Proxy Server'  => array(
 		                             'host'     => 'localhost:4040',
 		                             'driver'   => 'mysql5'
