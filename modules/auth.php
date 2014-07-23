@@ -288,20 +288,8 @@
 			if ( $selection == '' && ALLOW_CUSTOM_SERVERS ) {
 				$address = v($_POST['server_name']);
 				$type = v($_POST['server_type']);
-				$driver = '';
 				$allowed_types = explode(',', ALLOW_CUSTOM_SERVER_TYPES);
-				switch($type) {
-					case 'mysql':
-						if (in_array('mysql', $allowed_types))
-							$driver =  extension_loaded('mysqli') ? 'mysqli' : 'mysql5';
-						break;
-					case 'pgsql':
-						$driver = in_array('mysql', $allowed_types) ? 'pgsql' : '';
-						break;
-					case 'sqlite':
-						$driver = in_array('mysql', $allowed_types) ? 'sqlite' : '';
-						break;
-				}
+				$driver = in_array($type, $allowed_types) ? $type : '';
 				if ($address && $driver) {
 					// found a valid custom server definition, return it
 					$server = array(__('Custom Server'), array('host' => $address, 'driver' => $driver));

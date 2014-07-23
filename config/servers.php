@@ -30,7 +30,7 @@
 
 	// if the above is true, only the following server types will be allowed
 	// sqlite is not recommended here, in order to avoid possible file system attacks
-	$ALLOW_CUSTOM_SERVER_TYPES = "mysql,pgsql";
+	$ALLOW_CUSTOM_SERVER_TYPES = "mysqli,pgsql";
 
 	$SERVER_LIST = array(
 		'Localhost MySQL'           => array(
