@@ -22,7 +22,7 @@ class DbManager {
 	function DbManager() {
 	}
 
-	function connect($server, $user, $password, $db="") {
+	function connect($server, $user, $password) {
 		$host   = $server['host'];
 		$driver = $server['driver'];
 		
