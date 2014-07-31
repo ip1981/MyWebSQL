@@ -116,14 +116,6 @@
 	}
 
 	function getServerList() {
-		if ( AUTH_TYPE != 'LOGIN' ) {
-			if ( AUTH_TYPE != 'CUSTOM' )
-				return false;
-			require_once(BASE_PATH . '/lib/auth/custom.php');
-			if ( !MyWebSQL_Auth_Custom::showServerList() )
-				return false;
-		}
-
 		include (BASE_PATH . "/config/servers.php");
 		if (!defined('ALLOW_CUSTOM_SERVERS'))
 			define('ALLOW_CUSTOM_SERVERS', $ALLOW_CUSTOM_SERVERS);

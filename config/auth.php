@@ -27,17 +27,8 @@
 	// avoid sending plain text login info for additional security (disabled for HTTPS automatically)
 	define('SECURE_LOGIN', $secure_login_available);
 	
-	// AUTH_SERVER defines the name of mysql server for connections and authenticating users
-	// if AUTH_TYPE is set to LOGIN and there is no server defined in configuration (config/servers.php),
-	// then this will be used as default
-	define('AUTH_SERVER', 'localhost|mysql5');
-	// other examples
-	//define('AUTH_SERVER', 'localhost:4040|mysql4');
-	//define('AUTH_SERVER', 'localhost|mysqli');
-	//define('AUTH_SERVER', 'c:/sqlitedb/|sqlite');
-
 	// for AUTH_TYPE NONE only
-	// use the following userid and password to connect to mysql server
+	// use the following userid and password to connect to server
 	define('AUTH_LOGIN', 'test');
 	define('AUTH_PASSWORD', 'test');
 

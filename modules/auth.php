@@ -87,10 +87,9 @@
 		}
 
 		private function checkEnvironment() {
-			if ( !defined('AUTH_SERVER') || AUTH_SERVER == '' )
-				return $this->setError(__('Invalid server configuration'));
-
 			if ( !defined('AUTH_TYPE') || !(AUTH_TYPE == 'NONE' || AUTH_TYPE == 'BASIC' || AUTH_TYPE == 'LOGIN' || AUTH_TYPE == 'CUSTOM') )
+				return $this->setError(__('Invalid server configuration'));
+			if (count(getServerList()) == 0)
 				return $this->setError(__('Invalid server configuration'));
 
 			return true;
@@ -294,16 +293,13 @@
 					return $server;
 				}
 			}
-			
-			
-			// return default server info
-			return $this->getDefaultServer();
 		}
 		
 		private function getDefaultServer() {
-			$server_info = explode('|', AUTH_SERVER);
-			$host = array( 'host' => $server_info[0], 'driver' => $server_info[1] );
-			return array(AUTH_SERVER, $host);
+			$serverList = getServerList();
+			$server = key($serverList);
+			$host = current($serverList);
+			return array($server, $host);
 		}
 	}
 ?>
