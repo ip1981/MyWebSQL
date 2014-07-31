@@ -170,4 +170,20 @@
 	function phpCheck( $ver ) {
 		return version_compare(PHP_VERSION, $ver, '>=');
 	}
+
+	function getUserSSLCert($user, $dir) {
+		$cert = "$dir/$user-cert.pem";
+		$key = "$dir/$user-key.pem";
+		if (file_exists($cert) && file_exists($key))
+			return array($cert, $key);
+		$cert = "$dir/$user.crt";
+		$key = "$dir/$user.key";
+		if (file_exists($cert) && file_exists($key))
+			return array($cert, $key);
+		$cert = "$dir/$user/cert.pem";
+		$key = "$dir/$user/key.pem";
+		if (file_exists($cert) && file_exists($key))
+			return array($cert, $key);
+		return array(null, null);
+	}
 ?>

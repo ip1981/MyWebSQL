@@ -43,7 +43,7 @@
 		                             'user'     => 'root',   // set this yourself
 		                             'password' => 'sqlite'  // set this yourself
 		                         ),
- 		'Localhost PostgreSQL'     => array(
+		'Localhost PostgreSQL'     => array(
 		                             'host'     => 'localhost',
 		                             'driver'   => 'pgsql'
 		                         ),
@@ -56,9 +56,9 @@
 		                             'ssl-ca' => '/etc/ssl/ca-cert.pem',
 		                             'ssl-ca-path' => '/etc/ssl',
 		                             'ssl-cipher' => 'DHE-RSA-AES256-SHA:AES128-SHA',
-		                             // XXX: this may be user specific like a password:
-		                             'ssl-cert' => '/var/lib/ssl/client-foo-cert.pem',
-		                             'ssl-key' => '/var/lib/ssl/client-foo-key.pem',
+		                             // Directory with users certs and keys:
+		                             // <username>-cert.pem and <username>-key.pem
+		                             'ssl-user-path' => '/var/lib/ssl/users',
 		                         ),
 		*/
 		/*'MySQL Proxy Server'  => array(

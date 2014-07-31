@@ -139,6 +139,15 @@ class DB_Mysqli {
 			$ssl_cert = null;
 			$ssl_key = null;
 			$ssl_cipher = null;
+
+			if (!empty($server['ssl-user-path'])) {
+				log_message('DB: mysqli: SSL user path: ' . $server['ssl-user-path']);
+				list ($ssl_cert, $ssl_key) =
+					getUserSSLCert($user, $server['ssl-user-path']);
+				log_message('DB: mysqli: SSL user cert: ' . $ssl_cert);
+				log_message('DB: mysqli: SSL user key: ' . $ssl_key);
+			}
+
 			$ssl_verify_server_cert = !empty($server['ssl-verify-server-cert']);
 
 			if (!empty($server['ssl-cipher'])) {

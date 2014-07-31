@@ -94,7 +94,7 @@
 					createErrorPage();
 				}
 				else if (MODULE_ACCESS_MODE == 'allow' && !in_array($module_requested, $ALLOW_MODULES)) {
- 					createErrorPage();
+					createErrorPage();
 				} else {
 					include($module);
 					function_exists('processRequest') ? processRequest($db) : createErrorGrid($db, "");
