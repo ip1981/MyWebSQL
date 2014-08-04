@@ -33,9 +33,6 @@
 			if (Session::get('auth', 'valid'))
 				return $this->setParameters();
 
-			if (!$this->checkEnvironment())
-				return false;
-
 			if (AUTH_TYPE == 'NONE')
 				$this->getAuthNone();
 			else if (AUTH_TYPE == 'BASIC')
@@ -84,15 +81,6 @@
 		private function setError($str) {
 			$this->error = $str;
 			return false;
-		}
-
-		private function checkEnvironment() {
-			if ( !defined('AUTH_TYPE') || !(AUTH_TYPE == 'NONE' || AUTH_TYPE == 'BASIC' || AUTH_TYPE == 'LOGIN' || AUTH_TYPE == 'CUSTOM') )
-				return $this->setError(__('Invalid server configuration'));
-			if (count(getServerList()) == 0)
-				return $this->setError(__('Invalid server configuration'));
-
-			return true;
 		}
 
 		private function setParameters() {
