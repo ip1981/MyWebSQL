@@ -126,13 +126,12 @@
 			Session::set('auth', 'user', AUTH_LOGIN, true);
 			Session::set('auth', 'pwd', AUTH_PASSWORD, true);
 			Session::set('db', 'driver', $server[1]['driver']);
-			$this->db->disconnect();
 			header('Location: '.EXTERNAL_PATH);
 			return true;	
 		}
 
 		private function getAuthBasic() {
-			$server = $this->getDefaultServer();
+			$server = $this->getDefaulVtServer();
 			if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 				if ($this->db->connect($server[1],$_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW']))	{
 					Session::set('auth', 'valid', true);
@@ -141,6 +140,7 @@
 					Session::set('auth', 'user', $_SERVER['PHP_AUTH_USER'], true);
 					Session::set('auth', 'pwd', $_SERVER['PHP_AUTH_PW'], true);
 					Session::set('db', 'driver', $server[1]['driver']);
+					$this->db->disconnect();
 					return true;
 				} else
 					$this->setError( $this->db->getError() );
