@@ -18,6 +18,7 @@
 	// AUTH_TYPE defines the login/startup behaviour of the application
 	// NONE    = No userid/password is asked for (NOT recommended)
 	// BASIC   = browser requests authentication dialog
+	// SPROXY  = sproxy authentication, see https://github.com/zalora/sproxy
 	// LOGIN   = User enters userid and password manually
 	// CUSTOM  = Use a custom authentication scheme (see docs for details)
 	define('AUTH_TYPE', 'LOGIN');

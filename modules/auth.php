@@ -37,6 +37,8 @@
 				$this->getAuthNone();
 			else if (AUTH_TYPE == 'BASIC')
 				$this->getAuthBasic();
+			else if (AUTH_TYPE == 'SPROXY')
+				$this->getAuthSproxy();
 			else if (AUTH_TYPE == 'LOGIN') {
 				if (secureLoginPage())
 					$this->getAuthSecureLogin();
@@ -92,9 +94,11 @@
 					break;
 				case 'BASIC':
 					$this->server = $this->getDefaultServer();
+				case 'SPROXY':
+					$this->server = $this->getDefaultServer();
 				case 'LOGIN':
 					$server_name = Session::get('auth', 'server_name', true);
-					$this->server = $this->getServer($server_name); // XXX Rewrite getServer to be strict (e. i. no default)
+					$this->server = $this->getServer($server_name);
 					$this->username = Session::get('auth', 'user', true);
 					$this->password = Session::get('auth', 'pwd', true);
 					break;
@@ -131,7 +135,7 @@
 		}
 
 		private function getAuthBasic() {
-			$server = $this->getDefaulVtServer();
+			$server = $this->getDefaultServer();
 			if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 				if ($this->db->connect($server[1],$_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW']))	{
 					Session::set('auth', 'valid', true);
@@ -151,6 +155,28 @@
 			echo __('Invalid Credentials supplied');
 
 			return false;
+		}
+
+		private function getAuthSproxy() {
+			if (!isset($_SERVER['HTTP_FROM'])) {
+				die('Not authorized');
+			}
+			list ($username, $host) = explode('@', $_SERVER['HTTP_FROM'], 2);
+			log_message("auth: sproxy: from $username@$host");
+			$server = $this->getDefaultServer();
+			if (strstr($server[1]['driver'], 'mysql')) {
+				// MySQL hardcoded limit:
+				if (strlen($username) > 16)
+					$username = substr($username, 0, 16);
+			}
+			log_message("auth: sproxy: normal username $username");
+			Session::set('auth', 'server_name', $server[0], true);
+			Session::set('auth', 'host', $server[1]['host'], true);
+			Session::set('auth', 'user', $username, true);
+			Session::set('auth', 'pwd', '', true);
+			Session::set('db', 'driver', $server[1]['driver']);
+			Session::set('auth', 'valid', true);
+			return true;
 		}
 
 		private function getAuthLogin() {
