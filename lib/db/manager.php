@@ -16,7 +16,6 @@ if (defined("CLASS_COMMON_DB_INCLUDED"))
 define("CLASS_COMMON_DB_INCLUDED", "1");
 
 class DbManager {
-	var $conn;
 	var $errMsg;
 
 	function DbManager() {
