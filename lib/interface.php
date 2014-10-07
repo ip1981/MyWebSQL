@@ -14,7 +14,7 @@
 		$langMenu = '';
 		$editorMenu = '';
 		$langList = array();
-		include (BASE_PATH . "/config/themes.php");
+		include (CONFIG_PATH . "/themes.php");
 		foreach($THEMES as $themeId => $theme) {
 			if (THEME_PATH == $themeId)
 				$themeMenu .= '<li><a class="check" href="javascript:setPreference(\'theme\', \''.$themeId.'\')">'.$theme.'</a></li>';
@@ -30,7 +30,7 @@
 				$langMenu .= '<li><a href="javascript:setPreference(\'lang\', \''.$lang.'\')">'.$name.'</a></li>';
 		}
 
-		include (BASE_PATH . "/config/editors.php");
+		include (CONFIG_PATH . "/editors.php");
 		foreach($CODE_EDITORS as $editorId => $name) {
 			if (SQL_EDITORTYPE == $editorId)
 				$editorMenu .= '<li><a class="check" href="javascript:setPreference(\'editor\', \''.$editorId.'\')">'.$name.'</a></li>';
@@ -77,7 +77,7 @@
 		if (!defined('HOTKEYS_ENABLED') || !HOTKEYS_ENABLED)
 			return '';
 		$hotkeysHTML =  "<script type=\"text/javascript\" language=\"javascript\" src=\"cache.php?script=hotkeys\"></script><script type=\"text/javascript\" language=\"javascript\"> $(function() {\n";
-		include (BASE_PATH . "/config/keys.php");
+		include (CONFIG_PATH . "/keys.php");
 		foreach ($DOCUMENT_KEYS as $name => $func) {
 			$code = $KEY_CODES[$name][0];
 			$hotkeysHTML .=  "$(document).bind('keydown', '$code', function (evt) { $func; return false; });\n";

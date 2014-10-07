@@ -12,10 +12,10 @@
  	// called very early during initialization of the application
  	// bProcess suggests that the whole application needs to init, otherwise just the basics
 	function initConfiguration($bProcess = true) {
-		include_once(BASE_PATH . "/config/constants.php");
+		include_once(CONFIG_PATH . "/constants.php");
 
 		// theme setup
-		include(BASE_PATH . "/config/themes.php");
+		include(CONFIG_PATH . "/themes.php");
 		if ($bProcess && isset($_GET["theme"]) && array_key_exists($_GET["theme"], $THEMES)) {
 			define("THEME_PATH", $_GET["theme"]);
 			setcookie("theme", $_GET["theme"], time()+(COOKIE_LIFETIME*60*60), EXTERNAL_PATH);
@@ -26,7 +26,7 @@
 			define("THEME_PATH", $_COOKIE["theme"]);
 			
 		// language setup		
-		include(BASE_PATH . '/config/lang.php');  // we have to include language first for proper settings
+		include(CONFIG_PATH . '/lang.php');  // we have to include language first for proper settings
 		if ($bProcess && isset($_REQUEST["lang"]) && array_key_exists($_REQUEST["lang"], $_LANGUAGES) && file_exists(BASE_PATH . '/lang/'.$_REQUEST["lang"].'.php')) {
 			define('LANGUAGE', $_REQUEST["lang"]);
 			setcookie("lang", $_REQUEST["lang"], time()+(COOKIE_LIFETIME*60*60), EXTERNAL_PATH);
@@ -46,7 +46,7 @@
 		}
 		
 		// sql editor setup
-		include(BASE_PATH . "/config/editors.php");
+		include(CONFIG_PATH . "/editors.php");
 		if ($bProcess && isset($_GET["editor"]) && array_key_exists($_GET["editor"], $CODE_EDITORS)) {
 			define("SQL_EDITORTYPE", $_GET["editor"]);
 			setcookie("editor", $_GET["editor"], time()+(COOKIE_LIFETIME*60*60), EXTERNAL_PATH);
@@ -59,7 +59,7 @@
 			define("SQL_EDITORTYPE", $_COOKIE["editor"]);	
 
 		// initialize rest of the configuration to defaults
-		include_once (BASE_PATH . "/config/config.php");
+		include_once (CONFIG_PATH . "/config.php");
 		
 		if(!defined('LANGUAGE'))
 			define("LANGUAGE", DEFAULT_LANGUAGE);
@@ -71,15 +71,15 @@
 			define('SQL_EDITORTYPE', DEFAULT_EDITOR);
 
 		if ($bProcess) {
-			include(BASE_PATH . '/config/auth.php');
-			include(BASE_PATH . '/config/keys.php');
+			include(CONFIG_PATH . '/auth.php');
+			include(CONFIG_PATH . '/keys.php');
 		}
 	
 		return true;
 	}
 
 	function getKeyCodes() {
-		include(BASE_PATH . '/config/keys.php');
+		include(CONFIG_PATH . '/keys.php');
 		return $KEY_CODES;
 	}
 ?>

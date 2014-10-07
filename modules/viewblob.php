@@ -30,7 +30,7 @@
 			unset($_REQUEST["blobtype"]);
 		}
 
-		include(BASE_PATH . "/config/blobs.php");
+		include(CONFIG_PATH . "/blobs.php");
 		$bType = ( v($_REQUEST["blobtype"]) && array_key_exists(v($_REQUEST["blobtype"]), $blobTypes) ) ? v($_REQUEST["blobtype"]) : "txt";
 
 		// @todo: optimize. this should always fetch one row

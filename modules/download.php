@@ -18,7 +18,7 @@
 
 		switch( $_REQUEST['id'] ) {
 			case 'backup': {
-				include_once(BASE_PATH . "/config/backups.php");
+				include_once(CONFIG_PATH . "/backups.php");
 				$compression = v($_REQUEST['compression']);
 				$file = get_backup_filename( $compression );
 				include_once(BASE_PATH . "/lib/output.php");

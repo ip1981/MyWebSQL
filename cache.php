@@ -10,6 +10,12 @@
  */
   	define('BASE_PATH', dirname(__FILE__));
 
+	if (getenv('CONFIG_PATH')) {
+		define('CONFIG_PATH', getenv('CONFIG_PATH'));
+	} else {
+		define('CONFIG_PATH', BASE_PATH . "/config");
+	}
+
 	$useCache = file_exists('js/min/minify.txt');
 	include(BASE_PATH . '/modules/configuration.php');
 	initConfiguration(false);

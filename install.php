@@ -2,13 +2,19 @@
 
 	define('BASE_PATH', dirname(__FILE__));
 
+	if (getenv('CONFIG_PATH')) {
+		define('CONFIG_PATH', getenv('CONFIG_PATH'));
+	} else {
+		define('CONFIG_PATH', BASE_PATH . "/config");
+	}
+
 	if (version_compare(PHP_VERSION, '5.3', '<')) {
 		clearstatcache();
 	}
 	else {
 		clearstatcache(TRUE);
 	}
-	include(BASE_PATH . '/config/lang.php');  // we have to include language first for proper settings
+	include(CONFIG_PATH . '/lang.php');  // we have to include language first for proper settings
 	if (isset($_REQUEST["lang"]) && array_key_exists($_REQUEST["lang"], $_LANGUAGES) && file_exists(BASE_PATH . '/lang/'.$_REQUEST["lang"].'.php')) {
 		define('LANGUAGE', $_REQUEST["lang"]);
 	}
@@ -136,7 +142,7 @@
 		
 		<tr>
 			<th>Backup folder location</th>
-			<?php include_once(BASE_PATH . "/config/backups.php");
+			<?php include_once(CONFIG_PATH . "/backups.php");
 				if ( is_dir( BACKUP_FOLDER ) && is_writable( BACKUP_FOLDER ) ): ?>
 				<td class="pass">Pass</td>
 			<?php else: $all_pass = false; ?>

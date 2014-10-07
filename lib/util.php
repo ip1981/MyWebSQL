@@ -22,7 +22,7 @@
 	}
 
 	function getDbList(&$db) {
-		include (BASE_PATH . "/config/database.php");
+		include (CONFIG_PATH . "/database.php");
 		$server = Session::get('auth', 'server_name', true);
 		// return restrictive db list based on config
 		if (isset($DB_LIST) && isset($DB_LIST[$server]))
@@ -88,7 +88,7 @@
 			$_REQUEST["query"] = trim(v($_REQUEST["query"], ""), " \t\r\n;");
 			$module = BASE_PATH . "/modules/".$module_requested.".php";
 			if (ctype_alpha( $module_requested ) && file_exists($module)) {
-				require( BASE_PATH . '/config/modules.php' );
+				require( CONFIG_PATH . '/modules.php' );
 				// check for module access type and allow/disallow as needed
 				if (MODULE_ACCESS_MODE == 'deny' && in_array($module_requested, $DENY_MODULES)) {
 					createErrorPage();
@@ -509,7 +509,7 @@
 		$btype = "text";
 
 		if ($binary) {
-			include(BASE_PATH . "/config/blobs.php");
+			include(CONFIG_PATH . "/blobs.php");
 			foreach($blobTypes as $k => $v) {
 				if ( $v[1] && matchFileHeader($rs, $v[1]) ) {
 					$btype = $k;
