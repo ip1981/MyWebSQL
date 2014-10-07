@@ -9,6 +9,12 @@
  */
 	define('BASE_PATH', dirname(__FILE__));
 
+	if (getenv('CONFIG_PATH')) {
+		define('CONFIG_PATH', getenv('CONFIG_PATH'));
+	} else {
+		define('CONFIG_PATH', BASE_PATH . "/config");
+	}
+
 	header("Content-Type: text/html;charset=utf-8");
 	include_once(BASE_PATH . "/lib/session.php");
 	Session::init();
@@ -257,7 +263,7 @@
 	var commandEditor2 = null;
 	var commandEditor3 = null;
 <?php
-	include(BASE_PATH . '/config/updates.php');
+	include(CONFIG_PATH . '/updates.php');
 	if($AUTOUPDATE_CHECK === TRUE && Session::get('updates', 'check') == '' ) {
 		if (in_array(date('D'), $AUTOUPDATE_DAYS)) {
 			echo "\n\t$(function() { helpCheckUpdates(); });\n";

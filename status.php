@@ -10,7 +10,7 @@
  */
 
 	if( defined('MYWEBSQL_COMPACT_DIST') ) {
-		$files = scandir(BASE_PATH . "/config/");
+		$files = scandir(CONFIG_PATH);
 		foreach ($files as $config) {
 			$_cfn = BASE_PATH.'/mywebsql_config/'. basename($config);
 			if (file_exists($cfn) {
@@ -21,11 +21,17 @@
 
 	define('BASE_PATH', dirname(__FILE__));
 
+	if (getenv('CONFIG_PATH')) {
+		define('CONFIG_PATH', getenv('CONFIG_PATH'));
+	} else {
+		define('CONFIG_PATH', BASE_PATH . "/config");
+	}
+
 	header("Content-Type: text/html;charset=utf-8");
 	include_once(BASE_PATH . "/lib/session.php");
 	Session::init();
 
-	include_once(BASE_PATH . "/config/config.php");
+	include_once(CONFIG_PATH . "/config.php");
 
 	if (defined("TRACE_FILEPATH") && TRACE_FILEPATH && defined("TRACE_MESSAGES") && TRACE_MESSAGES)
 		ini_set("error_log", TRACE_FILEPATH);

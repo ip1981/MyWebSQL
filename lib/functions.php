@@ -102,7 +102,7 @@
 	}
 
 	function getLanguageList() {
-		include (BASE_PATH . "/config/lang.php");
+		include (CONFIG_PATH . "/lang.php");
 		$langList = array();
 		$files = scandir(BASE_PATH . "/lang/");
 		foreach ($files as $lang) {
@@ -116,7 +116,7 @@
 	}
 
 	function getServerList() {
-		include (BASE_PATH . "/config/servers.php");
+		include (CONFIG_PATH . "/servers.php");
 		if (!defined('ALLOW_CUSTOM_SERVERS'))
 			define('ALLOW_CUSTOM_SERVERS', $ALLOW_CUSTOM_SERVERS);
 		if (!defined('ALLOW_CUSTOM_SERVER_TYPES'))

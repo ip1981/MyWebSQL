@@ -113,7 +113,7 @@
 
 			Session::set('auth', 'type', AUTH_TYPE);
 			// set the language
-			include(BASE_PATH . '/config/lang.php');
+			include(CONFIG_PATH . '/lang.php');
 			if (isset($_REQUEST["lang"]) && array_key_exists($_REQUEST["lang"], $_LANGUAGES) && file_exists(BASE_PATH . '/lang/'.$_REQUEST["lang"].'.php')) {
 				$_lang = $_REQUEST["lang"];
 				setcookie("lang", $_REQUEST["lang"], time()+(COOKIE_LIFETIME*60*60), EXTERNAL_PATH);
