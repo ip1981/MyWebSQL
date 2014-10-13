@@ -5,12 +5,14 @@
  *
  * @file:      lib/util.php
  * @author     Samnan ur Rehman
- * @copyright  (c) 2008-2012 Samnan ur Rehman
+ * @copyright  (c) 2008-2014 Samnan ur Rehman
  * @web        http://mywebsql.net
  * @license    http://mywebsql.net/license
  */
 
 	include(BASE_PATH . '/lib/functions.php');
+	define('LIMIT_REGEXP', '/(.*)[\s]+(limit[\s]+[\d]+([\s]*(,|offset)[\s]*[\d]+)?)$/is');
+	define('SORT_REGEXP', '/(.*)[\s]+(ORDER[\s]+BY[\s]+([a-zA-z0-9\._]+|`.*`|\'.*\'|".*")\s*(ASC|DESC)?(\s*\,\s*([a-zA-z0-9\._]+|`.*`|\'.*\'|".*")\s*(ASC|DESC)?)*)$/is');
 
 	function showDBError($host, $user, $msg='') {
 		return __('Database connection failed to the server') .  '. ' .
@@ -125,7 +127,7 @@
 		$f = $db->getFieldInfo();
 
 		// see if all fields come from one table so we can allow editing
-		if (Session::get('select', 'has_limit') && count($f) > 0) {
+		if (Session::get('select', 'can_limit') && count($f) > 0) {
 			Session::set('select', 'unique_table', $f[0]->table);
 			for($i=1; $i<count($f);$i++) {
 				if ($f[$i]->table != Session::get('select', 'unique_table')) {	// bail out, more than one table data
@@ -138,13 +140,14 @@
 		//if (Session::get('select', 'unique_table') == "COLUMNS")
 		//	Session::del('select', 'unique_table');
 
-		$ed = Session::get('select', 'has_limit') && (Session::get('select', 'unique_table') == "" ? false : true);// && ($db->numRows() > 0);
+		$ed = Session::get('select', 'can_limit') && (Session::get('select', 'unique_table') == "" ? false : true);// && ($db->numRows() > 0);
 		// ------------ print header -----------
 		print "<tr id=\"fhead\">";
-		print "<th class=\"th tch\">#</th>";
+		print "<th class=\"th tch\"><div>#</div></th>";
 
 		if ($ed)
-			print "<th class=\"th_nosort tch\"><input class=\"check-all\" type=\"checkbox\" onclick=\"resultSelectAll()\" title=\"".__('Select/unselect All records')."\" /></th>";
+			print "<th class=\"th_nosort tch\"><div><input class=\"check-all\" type=\"checkbox\"
+			onclick=\"resultSelectAll()\" title=\"".__('Select/unselect All records')."\" /></div></th>";
 
 		$v = "";
 		// more than one field can be part of a primary key (composite key)
@@ -154,9 +157,10 @@
 
 		$fieldNames = '';
 		$fieldInfo = json_encode($f);
+		$i = 1;
 		foreach($f as $fn) {
 			$cls = $fn->type == 'numeric' ? "th_numeric" : "th";
-			print "<th nowrap=\"nowrap\" class='$cls'>";
+			print "<th nowrap=\"nowrap\" class='$cls'><div>";
 			if ($fn->pkey == 1) {
 				Session::add('select', 'pkey', $fn->name);
 				print "<span class='pk' title='".__('Primary key column')."'>&nbsp;</span>";
@@ -168,7 +172,15 @@
 			else if ($fn->mkey == 1 && !$fn->blob)		// blob/text fields are FULL TEXT KEYS only
 				Session::add('select', 'mkey', $fn->name);
 
-			print $fn->name."</th>";
+			print $fn->name;
+
+			if (Session::get('select', 'sortcol') == $i) {
+				print ( Session::get('select', 'sort') == 'DESC' ? '&nbsp;&#x25BE;' : '&nbsp;&#x25B4' );
+			}
+
+			$i++;
+
+			print "</div></th>";
 			$fieldNames .= "'" . str_replace("'", "\\'", $fn->name) . "',";
 		}
 
@@ -200,7 +212,7 @@
 			}
 			print "</tr>\n";
 			$j++;
-			if (Session::get('select', 'has_limit') && $record_limit > 0 && $j >= $record_limit)
+			if (Session::get('select', 'can_limit') && $record_limit > 0 && $j >= $record_limit)
 				break;
 		}
 
@@ -214,7 +226,7 @@
 		print '<div id="title">'. $gridTitle . '</div>';
 
 		$message = '';
-		if (Session::get('select', 'has_limit')) { // can limit be applied to this type of query (e.g. show,explain)
+		if (Session::get('select', 'can_limit')) { // can limit be applied to this type of query (e.g. show,explain)
 			if (Session::get('select', 'limit')) {  // yes, and limit is applied to records by the application
 				$total_records = Session::get('select', 'count');
 				$total_pages = ceil($total_records / $record_limit);
@@ -392,20 +404,57 @@
 	}
 
 	function getQueryType($query) {
-		$type = array('result'=>FALSE,'has_limit'=>FALSE,'update'=>FALSE);
+		$type = array('result'=>FALSE,'can_limit'=>FALSE,'has_limit'=>FALSE,'update'=>FALSE);
 		$query = trim($query, " \n\t");
 		$query = strtolower(substr($query, 0, 7));  // work on only first few required characters of query
 		if(substr($query, 0, 6) == "select" || substr($query, 0, 4) == "desc"
 					|| substr($query, 0, 7) == "explain" || substr($query, 0, 4) == "show"
 					|| substr($query, 0, 4) == "help" ) {
 			$type['result'] = TRUE;
-			if (substr($query, 0, 6) == "select")
-				$type['has_limit'] = TRUE; // we don't want to limit results for other queries like 'show...'
+			if (substr($query, 0, 6) == "select") {
+				$type['can_limit'] = TRUE; // we don't want to limit results for other queries like 'show...'
+				preg_match(LIMIT_REGEXP, $query, $matches);
+				if (count($matches) == 3) {
+					$type['has_limit'] = true;
+				}
+			}
 		}
 		else
 			$type['update'] = TRUE;
 
 		return $type;
+	}
+
+	function sortQuery($query, $field) {
+		$query = trim($query);
+		$sort = '';
+		$sort_type = Session::get('select', 'sort');
+		if (!$sort_type)
+			$sort_type = 'ASC';
+		$limit = '';
+		// find and extract limit clause out of query (must be the last clause, otherwise sorting will not work)
+		preg_match(LIMIT_REGEXP, $query, $matches);
+		if (count($matches) == 3) {
+			$query = trim($matches[1]);
+			$limit = trim($matches[2]);
+		}
+		preg_match(SORT_REGEXP, $query, $matches);
+		if (count($matches) > 3) {
+			$query = trim($matches[1]);
+			// if sorting with same field, change sorting order
+			if ( trim($matches[3]) == $field )
+				$sort_type = $sort_type == 'ASC' ? 'DESC' : 'ASC';
+			else // reset to ascending order
+				$sort_type = 'ASC';
+		}
+
+		Session::set('select', 'sortcol', $field);
+		Session::set('select', 'sort', $sort_type);
+		$sort = 'ORDER BY ' . $field . ' ' . $sort_type;
+
+		$query .= ' ' . $sort . ' ' . $limit;
+
+		return $query;
 	}
 
 	function getCommandInfo($sql) {

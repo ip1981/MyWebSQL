@@ -3,7 +3,7 @@
  *
  * @file:      js/interface.js
  * @author     Samnan ur Rehman
- * @copyright  (c) 2008-2012 Samnan ur Rehman
+ * @copyright  (c) 2008-2014 Samnan ur Rehman
  * @web        http://mywebsql.net
  * @license    http://mywebsql.net/license
  */
@@ -68,6 +68,7 @@ $(document).ready(function () {
 		,south__resizable: true, south__closable: true, south__minSize: 66, south__size: 160
 		,center__onresize: function() { layoutState.save('data_layout'); }
 		,enableCursorHotkey: false
+		,onresizeall_end: function() { if ($("#dataTable").length) createTableHeader('dataTable'); }
 	};
 
 	data_layout = $('div.ui-layout-center').layout( $.extend(data_layout_props, layoutState.load('data_layout')) );
