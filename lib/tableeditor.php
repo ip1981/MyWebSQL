@@ -281,10 +281,9 @@ class tableEditor {
 			$field->ftype = strtolower(substr($row['Type'], 0, $len));
 			if ($field->ftype == 'enum' || $field->ftype == 'set') { // enum or set type with list of values
 				$field->flen = '';
-				$regex = "/'(.*?)'/";
+				$regex = "/\('(.*)'\)/";
 				preg_match_all($regex, $row['Type'], $list);
-				$list = $list[1];
-				$field->flist = $list;
+				$field->flist = array_map(function($s) { return str_replace("''", "'", $s); }, explode("','", $list[1][0]));
 			}
 			else { // field type with valid length identifier
 				$len2 = strpos($row['Type'], ')', $len);
@@ -300,6 +299,9 @@ class tableEditor {
 		$field->fpkey = $row['Key'] == 'PRI' ? '1' : '0';
 		$field->fauto = strpos($row['Extra'], 'auto_increment') === FALSE ? '0' : '1';
 		$field->fnull = $row['Null'] == 'NO' ? '1' : '0';
+		
+		if ( $field->fnull == '1' && $field->fval == null)
+			$field->fval = '';
 
 		return $field;
 	}

@@ -39,12 +39,12 @@ class DB_Mysqli {
 
 	// these help identify field definitions more clearly
 	var $field_types = array(
-		7 => 'timestamp',
-		10 => 'timestamp',
-		11 => 'timestamp',
-		12 => 'timestamp',
-		13 => 'year',
-		16 => 'bit',
+		7   => 'datetime',
+		10  => 'date',
+		11  => 'time',
+		12  => 'datetime',
+		13  => 'year',
+		16  => 'bit',
 		246 => 'numeric'
 	);
 
@@ -345,7 +345,7 @@ class DB_Mysqli {
 		return @mysqli_fetch_array($this->result[$stack], $type);
 	}
 
-	function fetchSpecificRow($num, $type="", $stack=0) {
+	function fetchSpecificRow($num, $stack=0, $type="") {
 		if($type == "")
 			$type = MYSQL_BOTH;
 		else if ($type == "num")
@@ -512,8 +512,12 @@ class DB_Mysqli {
 					$f->type = 'numeric';
 				else
 					$f->type = 'text';
+				
 				if ($f->type == 'enum' || $f->type == 'set')
 					$f->list = $this->getFieldValues($f->table, $f->name);
+				else if ($f->type == 'bit')
+					$f->list = array('0', '1');
+					
 				$fields[] = $f;
 			}
 			$i++;
@@ -592,10 +596,9 @@ class DB_Mysqli {
 		if (!isset($matches[1]))
 			preg_match('/set\((.*)\)$/', $type, $matches);
 		if (isset($matches[1])) {
-			$list = explode(',', $matches[1]);
-			foreach($list as $k => $v)
-				$list[$k] = str_replace("\\'", "'", trim($v, " '"));
-			return $list;
+			$regex = "/\('(.*)'\)/";
+			preg_match_all($regex, $row['Type'], $list);
+			return array_map(function($s) { return str_replace("''", "'", $s); }, explode("','", $list[1][0]));
 		}
 		return ( (object) array('list' => array()) );
 	}
