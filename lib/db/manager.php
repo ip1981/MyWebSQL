@@ -51,4 +51,8 @@ class DbManager {
 		return $this->errMsg;
 	}
 }
+
+function replace_single_quotes($s) {
+	return str_replace("''", "'", $s);
+}
 ?>
