@@ -118,9 +118,9 @@
 	function getServerList() {
 		include (BASE_PATH . "/config/servers.php");
 		if (!defined('ALLOW_CUSTOM_SERVERS'))
-			define('ALLOW_CUSTOM_SERVERS', $ALLOW_CUSTOM_SERVERS);
+			define('ALLOW_CUSTOM_SERVERS', isset($ALLOW_CUSTOM_SERVERS) ? $ALLOW_CUSTOM_SERVERS : FALSE);
 		if (!defined('ALLOW_CUSTOM_SERVER_TYPES'))
-			define('ALLOW_CUSTOM_SERVER_TYPES', $ALLOW_CUSTOM_SERVER_TYPES);
+			define('ALLOW_CUSTOM_SERVER_TYPES', isset($ALLOW_CUSTOM_SERVER_TYPES) ? $ALLOW_CUSTOM_SERVER_TYPES : 'mysqli,pgsql');
 		return $SERVER_LIST;
 	}
 
