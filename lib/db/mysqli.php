@@ -184,7 +184,7 @@ class DB_Mysqli {
 			log_message('DB: mysqli: not using SSL');
 		}
 
-		list($host, $port) = explode(':', $server['host']);
+		list($host, $port) = array_pad(explode(':', $server['host']), 2, null);
 		$connected = @mysqli_real_connect($this->conn, $host, $user, $password, $db, $port, null, $flags);
 		if (!$connected) {
 			return $this->error(__('Database connection failed to the server') . ": " .
